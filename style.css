@@ -20,6 +20,7 @@
 
 body {
   height: 100vh;
+  min-height: 500px;
   transition: 0.2s;
   background-color: var(--background-color);
 
@@ -169,9 +170,9 @@ body {
   color: lightgrey;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 410px) {
   .cc-main-control-pane {
-    width: 570px;
+    width: 390px;
   }
 }
 

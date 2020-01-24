@@ -51,7 +51,11 @@ const rgbAsInt = (color) => {
   return color[0] + color[1] + color[2];
 }
 
-const addPreviousColor = (color) => {
+const areColorsEqual = (first, second) => {
+  return first[0] === second[0] && first[1] === second[1] && first[2] === second[2];
+}
+
+const addColor = (color) => {
   const currentColorHex = rgbToHex(color);
   const currentColorInt = rgbAsInt(color);
 
@@ -66,30 +70,26 @@ const addPreviousColor = (color) => {
 }
 
 const onColorCycleInterval = () => {
-  const previousColor = currentColor;
-  const previousColorInt = rgbAsInt(previousColor);
-
-  currentColor[0] = clamp(currentColor[0] + parseInt(redChangeInput.value), 0, 255);
-  currentColor[1] = clamp(currentColor[1] + parseInt(greenChangeInput.value), 0, 255);
-  currentColor[2] = clamp(currentColor[2] + parseInt(blueChangeInput.value), 0, 255);
+  const newColor = [
+    clamp(currentColor[0] + parseInt(redChangeInput.value || 0), 0, 255),
+    clamp(currentColor[1] + parseInt(greenChangeInput.value || 0), 0, 255),
+    clamp(currentColor[2] + parseInt(blueChangeInput.value || 0), 0, 255)
+  ];
 
   const currentColorHex = rgbToHex(currentColor);
-  const currentColorInt = rgbAsInt(currentColor);
   document.body.style.backgroundColor = currentColorHex;
   startingColorInput.value = currentColorHex;
-  if (currentColorInt === 0 || currentColorInt === 255 * 3) {
-    addPreviousColor(currentColor);
-    stopCycle();
-  } else if (currentColorInt === previousColorInt) {
+
+  if (areColorsEqual(currentColor, newColor)) {
+    addColor(newColor);
     stopCycle();
   } else {
-    addPreviousColor(previousColor);
+    addColor(currentColor);
+    currentColor = newColor;
   }
 };
 
 const startCycle = () => {
-  document.body.style.backgroundColor = rgbToHex(currentColor);
-
   startingColorInput.readOnly = true;
   redChangeInput.readOnly = true;
   greenChangeInput.readOnly = true;
@@ -129,6 +129,17 @@ const checkColorInput = (value) => {
   } else {
     startingColorError.innerHTML = '';
     currentColor = hexToRgb(value);
+
+    const newColor = [
+      clamp(currentColor[0] + parseInt(redChangeInput.value || 0), 0, 255),
+      clamp(currentColor[1] + parseInt(greenChangeInput.value || 0), 0, 255),
+      clamp(currentColor[2] + parseInt(blueChangeInput.value || 0), 0, 255)
+    ];
+    if (areColorsEqual(newColor, currentColor)) {
+      startingColorError.innerHTML = 'No change in colors. Nothing to be done.';
+      return false;
+    }
+
     return true;
   }
 }
